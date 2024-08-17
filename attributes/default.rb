@@ -83,6 +83,7 @@ default['os-hardening'].tap do |os_hardening|
     auth['gid_max'] = 60000
     auth['sys_uid_max'] = 999
     auth['sys_gid_max'] = 999
+    auth['faillock'] = false
 
     # PAM settings
     auth['pam'].tap do |pam|

@@ -9,9 +9,17 @@
 auth        required      pam_tally2.so deny=<%= node['os-hardening']['auth']['retries'] %> onerr=fail unlock_time=<%= node['os-hardening']['auth']['lockout_time'] %>
 <% end %>
 auth        required      pam_env.so
+<% if node['os-hardening']['auth']['faillock'] %>
+auth        required      pam_faillock.so preauth audit deny=5 unlock_time=1800
+auth        [success=1 default=bad] pam_unix.so try_first_pass nullok
+auth        [default=die] pam_faillock.so authfail audit deny=5 unlock_time=1800
+auth        sufficient    pam_faillock.so authsucc audit deny=5 unlock_time=1800
+auth        required      pam_deny.so
+<% else %>
 auth        sufficient    pam_unix.so nullok try_first_pass
 auth        requisite     pam_succeed_if.so uid >= 500 quiet
 auth        required      pam_deny.so
+<% end %>
 
 <% if node['os-hardening']['auth']['retries'] > 0 %>
 account     required      pam_tally2.so
